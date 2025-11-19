@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const NUM_IMAGES = ROWS * COLS; // 12
 
     const BASE_PATH = './1_cover/';
-    const DRAG_DELAY_MS = 100; // 홀드 시간 단축 유지
+    const DRAG_DELAY_MS = 100;
 
     // 1. 이미지 URL 목록 생성
     const FRONT_IMAGE_URLS = [];
