@@ -1,2 +1,0 @@
-# portfolio
-zzunn web portfolio
