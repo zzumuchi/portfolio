@@ -6,17 +6,24 @@
     --card-y: 0px;
     --drag-rot-z: 0deg; 
     --mouse-rot-z: 0deg; 
+    
+    /* 폰트 변수 설정 */
+    --main-font: 'IBM Plex Mono', monospace; 
 }
 
 body {
     background-color: #333; 
+    
     display: block;
     margin: 0; 
     height: 100vh; 
     width: 100vw;
+    
     perspective: 1000px;
     overflow: hidden;
     position: relative;
+    font-family: var(--main-font); /* 폰트 적용 */
+    color: white; /* 텍스트 색상 기본 설정 */
 }
 
 #grid-container {
@@ -24,6 +31,7 @@ body {
     top: 50%; 
     left: 50%; 
     transform: translate(-50%, -50%); 
+    
     width: calc(3 * var(--card-width)); 
     height: calc(4 * var(--card-height)); 
 }
@@ -35,7 +43,7 @@ body {
     cursor: pointer;
     transform-style: preserve-3d;
     
-    /* ❗ 안정화: 위치 이동 트랜지션 (튕겨나가기 물리 효과를 위해 추가된 복잡한 트랜지션 제거) */
+    /* 위치 이동 트랜지션 */
     transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94); 
     
     transform: translate(var(--card-x), var(--card-y)) rotateZ(var(--drag-rot-z)); 
@@ -47,7 +55,7 @@ body {
     position: relative;
     transform-style: preserve-3d;
     
-    /* 뒤집기 모션 속도: 느리고 확실하게 */
+    /* 뒤집기 모션 속도 */
     transition: transform 1.0s cubic-bezier(0.4, 0.2, 0, 1.25); 
 }
 
@@ -75,7 +83,6 @@ body {
     transition: none; 
     z-index: 1000 !important; 
     cursor: grabbing;
-    /* 그림자 제거 유지 */
     transform: translate(var(--card-x), var(--card-y)) rotateZ(var(--drag-rot-z)); 
 }
 
@@ -89,13 +96,35 @@ body {
     transition: none; 
 }
 
-
-#reset-button {
+/* ❗ 오른쪽 하단 메뉴 (#right-menu) 스타일 */
+#right-menu {
     position: fixed;
     bottom: 20px;
     right: 20px;
-    padding: 10px 20px;
-    font-size: 16px;
-    cursor: pointer;
+    padding: 0;
     z-index: 2000;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    font-size: 14px;
+}
+
+/* ❗ 왼쪽 하단 메뉴 (#left-menu) 스타일 */
+#left-menu {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    padding: 0;
+    z-index: 2000;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    font-size: 14px;
+}
+
+.menu-item {
+    cursor: pointer;
+    padding: 4px 0;
+    /* ❗ 수정: 텍스트를 소문자로 표시 */
+    text-transform: lowercase; 
 }
