@@ -1,13 +1,22 @@
 document.addEventListener('DOMContentLoaded', () => {
     
     const gridContainer = document.getElementById('grid-container');
-    const resetButton = document.getElementById('reset-button');
     
+    // 오른쪽 메뉴 버튼
+    const resetButton = document.getElementById('reset-button');
+    const faceFrontButton = document.getElementById('face-front-button');
+    const faceBackButton = document.getElementById('face-back-button');
+    
+    // 왼쪽 메뉴 버튼
+    const copyEmailButton = document.getElementById('copy-email');
+    const instaLinkButton = document.getElementById('insta-link');
+
     const ROWS = 4; 
     const COLS = 3; 
-    const NUM_IMAGES = ROWS * COLS; // 12
+    const NUM_IMAGES = ROWS * COLS; 
 
-    const BASE_PATH = './1_cover/';
+    // ❗ Root 폴더 기준으로 이미지 경로 설정
+    const BASE_PATH = '../1_cover/'; 
     const DRAG_DELAY_MS = 100;
 
     // 1. 이미지 URL 목록 생성
@@ -33,13 +42,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const initialPositions = []; 
     let cardsCreated = false;
 
-
     // --- 1. 초기 위치 계산 함수 ---
     const calculateInitialPositions = () => {
         initialPositions.length = 0; 
-        
         const gridRect = gridContainer.getBoundingClientRect();
-        
         let cardWidth = gridRect.width / COLS;
         let cardHeight = gridRect.height / ROWS;
 
@@ -50,10 +56,8 @@ document.addEventListener('DOMContentLoaded', () => {
         for (let i = 0; i < NUM_IMAGES; i++) {
             const row = Math.floor(i / COLS);
             const col = i % COLS;
-            
             const initialX = col * cardWidth;
             const initialY = row * cardHeight;
-            
             initialPositions.push({ x: initialX, y: initialY });
         }
     };
@@ -61,48 +65,37 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- 2. 카드 생성 및 초기 위치 설정 함수 ---
     const createAndPlaceCards = () => {
         if (cardsCreated) return;
-
         calculateInitialPositions();
-        
         for (let i = 0; i < NUM_IMAGES; i++) {
             const { x: initialX, y: initialY } = initialPositions[i];
-
             const cardContainer = document.createElement('div');
             cardContainer.classList.add('card-container');
             cardContainer.dataset.index = i;
-            
             cardContainer.style.zIndex = 10 + i; 
             cardContainer.style.setProperty('--card-x', `${initialX}px`);
             cardContainer.style.setProperty('--card-y', `${initialY}px`);
             cardContainer.dataset.isDragged = 'false';
             
-            // 데이터셋에 초기 위치 저장
             cardContainer.dataset.currentX = initialX;
             cardContainer.dataset.currentY = initialY;
-            
-            // 물리 속성 데이터 속성 제거됨
 
             const cardInner = document.createElement('div');
             cardInner.classList.add('card-inner');
-
             const front = document.createElement('div');
             front.classList.add('card-face', 'card-front');
             front.style.backgroundImage = `url('${FRONT_IMAGE_URLS[i]}')`; 
-            
             const back = document.createElement('div');
             back.classList.add('card-face', 'card-back');
             back.style.backgroundImage = `url('${BACK_IMAGE_URLS[i]}')`; 
-
             cardInner.appendChild(front);
             cardInner.appendChild(back);
             cardContainer.appendChild(cardInner);
             gridContainer.appendChild(cardContainer);
         }
         cardsCreated = true;
-        // ❗ 물리 엔진 루프 시작 코드 제거됨
     };
     
-    // --- 3. 리사이즈 시 위치 업데이트 함수 (생략) ---
+    // --- 3. 리사이즈 시 위치 업데이트 함수 ---
     const updateCardPositionsOnResize = () => {
         calculateInitialPositions(); 
         document.querySelectorAll('.card-container').forEach((card, i) => {
@@ -123,9 +116,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     // --- 4. 인터랙션 로직 ---
+    
+    // 함수: 모든 카드를 지정된 상태(0도 또는 180도)로 뒤집음
+    const flipAllCards = (targetRotation) => {
+        document.querySelectorAll('.card-container').forEach(card => {
+            const isFlipped = card.classList.contains('is-flipped');
+            
+            if (targetRotation === 0) {
+                if (isFlipped) {
+                    card.classList.remove('is-flipped');
+                }
+            } else if (targetRotation === 180) {
+                if (!isFlipped) {
+                    card.classList.add('is-flipped');
+                }
+            }
+        });
+    };
 
     gridContainer.addEventListener('click', (e) => {
-        if (totalDragDistance < dragDistanceThreshold) {
+        if (totalDragDistance < 5) {
             const card = e.target.closest('.card-container');
             if (card) {
                 card.classList.toggle('is-flipped');
@@ -151,11 +161,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         dragTimeout = setTimeout(() => {
             if (isMouseDown) {
-                let currentX, currentY;
-                
-                // 데이터셋에서 위치를 가져옴 (물리 루프가 없으므로 CSS나 dataset에서 직접 가져옴)
-                currentX = parseFloat(card.dataset.currentX);
-                currentY = parseFloat(card.dataset.currentY);
+                let currentX = parseFloat(card.dataset.currentX);
+                let currentY = parseFloat(card.dataset.currentY);
 
                 if (!isNaN(currentX) && !isNaN(currentY)) {
                     currentDragCard.dataset.currentX = currentX;
@@ -176,14 +183,13 @@ document.addEventListener('DOMContentLoaded', () => {
         lastMouseX = e.clientX;
         lastMouseY = e.clientY;
 
-        // 1. 드래그 중인 경우
         if (isMouseDown && currentDragCard) {
             const dx = e.clientX - startX;
             const dy = e.clientY - startY;
             
             totalDragDistance = Math.sqrt(dx * dx + dy * dy);
 
-            if (totalDragDistance > dragDistanceThreshold) {
+            if (totalDragDistance > 5) {
                 const initialXStr = currentDragCard.dataset.currentX;
                 const isPositionSaved = initialXStr !== undefined && initialXStr !== 'NaN' && initialXStr !== 'null';
 
@@ -205,7 +211,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     currentDragCard.style.setProperty('--card-x', `${newX}px`);
                     currentDragCard.style.setProperty('--card-y', `${newY}px`);
 
-                    // ❗ 드래그 방향에 따른 Z축 회전 계수를 유지
+                    // Z축 회전 적용
                     const angleZ = Math.min(Math.max(dxMove * 0.1, -15), 15); 
                     currentDragCard.style.setProperty('--drag-rot-z', `${angleZ}deg`);
                 }
@@ -225,13 +231,12 @@ document.addEventListener('DOMContentLoaded', () => {
         if (isDragging && currentDragCard) {
             isDragging = false;
             currentDragCard.classList.remove('is-dragging');
-            currentDragCard.style.setProperty('--drag-rot-z', `0deg`); // 회전 제거
+            currentDragCard.style.setProperty('--drag-rot-z', `0deg`); 
             
             maxZIndex++;
             currentDragCard.style.zIndex = maxZIndex;
             currentDragCard.dataset.isDragged = 'true';
             
-            // 최종 위치를 다음 드래그 시작점으로 저장
             const finalX = currentDragCard.style.getPropertyValue('--card-x');
             const finalY = currentDragCard.style.getPropertyValue('--card-y');
             
@@ -245,7 +250,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // 이미지 원위치 버튼 기능
+    // --- 5. 메뉴 기능 구현 ---
+    
+    // 1. REARRANGE (재정렬) 기능
     resetButton.addEventListener('click', () => {
         maxZIndex = 10 + NUM_IMAGES;
 
@@ -259,13 +266,36 @@ document.addEventListener('DOMContentLoaded', () => {
             
             card.style.zIndex = 10 + index; 
             
-            // 데이터셋 및 회전 초기화
             card.dataset.currentX = x;
             card.dataset.currentY = y;
             card.dataset.isDragged = 'false';
             card.style.setProperty('--drag-rot-z', `0deg`); 
-            card.classList.remove('is-moved'); 
-            card.style.setProperty('--mouse-rot-z', `0deg`); 
         });
+    });
+
+    // 2. WHITE (모두 앞면) 기능
+    faceFrontButton.addEventListener('click', () => {
+        flipAllCards(0);
+    });
+
+    // 3. BLACK (모두 뒷면) 기능
+    faceBackButton.addEventListener('click', () => {
+        flipAllCards(180);
+    });
+
+    // 4. 이메일 복사 기능
+    copyEmailButton.addEventListener('click', () => {
+        const email = "jykim0418@gmail.com";
+        navigator.clipboard.writeText(email).then(() => {
+            alert("이메일 주소가 클립보드에 복사되었습니다: " + email);
+        }).catch(err => {
+            console.error('클립보드 복사 실패:', err);
+            alert("이메일 복사 실패 (콘솔 확인)");
+        });
+    });
+
+    // 5. 인스타그램 이동 기능
+    instaLinkButton.addEventListener('click', () => {
+        window.open("https://www.instagram.com/zzunnyoung/", "_blank");
     });
 });
