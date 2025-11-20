@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ❗ 이미지 경로 설정: Root 폴더의 '1_cover'로 접근 (GitHub Pages 환경 고려)
     // 만약 깨짐 현상이 지속되면, 이 경로를 '/portfolio/1_cover/' 등으로 수정해야 할 수 있습니다.
-    const BASE_PATH = './1_cover/'; 
+    const BASE_PATH = '../1_cover/'; 
     const DRAG_DELAY_MS = 100;
 
     // 1. 이미지 URL 목록 생성
