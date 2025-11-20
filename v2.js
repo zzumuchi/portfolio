@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const NUM_IMAGES = ROWS * COLS; 
 
     // ❗ Root 폴더 기준으로 이미지 경로 설정
-    const BASE_PATH = '../1_cover/'; 
+    const BASE_PATH = './1_cover/'; 
     const DRAG_DELAY_MS = 100;
 
     // 1. 이미지 URL 목록 생성
